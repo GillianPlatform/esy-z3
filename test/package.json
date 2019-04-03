@@ -1,0 +1,43 @@
+{
+  "name": "esy-z3-test",
+  "version": "0.1.0",
+  "description": "testing the esy packaging of z3",
+  "license": "MIT",
+  "esy": {
+    "build": "dune build ml_example.exe"
+  },
+  "scripts": {
+    "test": "dune runtest"
+  },
+  "dependencies": {
+    "z3": "*",
+    "ocaml": "~4.6.0",
+    "@opam/dune": "*"
+  },
+  "resolutions": {
+    "z3": {
+      "source": "https://github.com/Z3Prover/z3/archive/z3-4.8.4.tar.gz#md5:b74bbb04e90c034125fe9e01988add95",
+      "override": {
+        "exportedEnv": {
+          "LD_LIBRARY_PATH": {
+            "scope": "global",
+            "val": "#{self.lib}: $LD_LIBRARY_PATH"
+          }
+        },
+        "buildsInSource": true,
+        "build": [
+          "python2.7 scripts/mk_make.py --prefix=#{self.install} --ml --staticlib",
+          "make -C build",
+          "sh -c \"cp build/libz3* build/api/ml/\""
+        ],
+        "install": [
+          "sh -c \"ocamlfind install z3 build/api/ml/META -nodll build/api/ml/*\""
+        ],
+        "dependencies": {
+          "@opam/num": "*",
+          "ocaml": ">=4.3.0"
+        }
+      }
+    }
+  }
+}
